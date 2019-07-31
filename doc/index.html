@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'>
+<h1 id="label-Ejemplo+SDK+Centry-Magento2">Ejemplo SDK Centry-Magento2</h1>
+
+<p>Este proyecto actualiza stock y precios desde Magento hacia Centry a través
+de dos <em>Cron Jobs</em> con tiempos de ejecución configurables. También
+envía ordenes desde Centry a Magento gracias a un <em>webhook</em>
+previamente registrado en Centry. Todos estos movimientos quedan
+registrados en una base de datos local del proyecto.</p>
+
+<h3 id="label-Requerimientos">Requerimientos</h3>
+<ul><li>
+<p><a href="https://www.ruby-lang.org/">Ruby 2.3.7</a>.</p>
+</li><li>
+<p><a href="https://rubyonrails.org/">Rails 5.2.2</a>.</p>
+</li><li>
+<p><a href="https://www.sqlite.org/index.html">SQLite3</a>.</p>
+</li><li>
+<p><a href="https://redis.io/">Redis</a>.</p>
+</li><li>
+<p><a href="https://ngrok.com/">Ngrok</a>.</p>
+</li><li>
+<p>Servidor con <a href="https://magento.com/tech-resources/download">Magento
+2</a>.</p>
+</li><li>
+<p>Cuenta en Magento 2.</p>
+</li><li>
+<p>Cuenta en <a href="https://www.centry.cl">Centry</a>.</p>
+</li></ul>
+
+<h3 id="label-Vista+General">Vista General</h3>
+
+<p>Este proyecto consta principalmente de:</p>
+<ul><li>
+<p>Modelos</p>
+<ul><li>
+<p>Producto: Contiene información para relacionar productos entre Centry y la
+integración.</p>
+</li><li>
+<p>Orden: Contiene información para relacionar ordenes entre Centry y la
+integración.</p>
+</li><li>
+<p>Webhook: Contiene información de los webhooks registrados.</p>
+</li><li>
+<p>Producto: Contiene información para relacionar productos entre Centry y la
+integración.</p>
+</li><li>
+<p>Orden: Contiene información para relacionar ordenes entre Centry y la
+integración.</p>
+</li><li>
+<p>Webhook: Contiene información de los webhooks registrados.</p>
+</li></ul>
+</li><li>
+<p>Controlador</p>
+<ul><li>
+<p><code>notification_listener_controller.rb</code> encargado de recibir
+notificaciones desde el webhook registrado.</p>
+</li></ul>
+</li><li>
+<p>Workers Realizan las tareas de envío de información lo que permite que cada
+tarea sea independiente de otra:</p>
+<ul><li>
+<p><code>centry_worker.rb</code> y <code>integration_worker.rb</code>: Generan
+una instancia de la API de Centry y de la integración a usar (en este
+ejemplo, Magento) respectivamente.</p>
+</li><li>
+<p><code>integration_stock_worker.rb</code> y
+<code>integration_price_worker.rb</code>: Son los workers encargados de
+traer los cambios de stock y precio respectivamente <strong>desde la
+integración hacia la base de datos local</strong>.</p>
+</li><li>
+<p><code>centry_stock_save_worker.rb</code> y
+<code>centry_prices_save_worker.rb</code>: Son los workers encargados de
+mandar los cambios de stock y precio respectivamente <strong>desde la base
+de datos local hacia Centry</strong>.</p>
+</li><li>
+<p><code>notification_listener_worker.rb</code>: Es el worker encargado de
+atender las notificaciones recibidas por el <em>webhook</em>,  como por
+ejemplo, mandar una orden a la integración cuando llega una notificación de
+orden desde Centry.</p>
+</li></ul>
+</li><li>
+<p>Inicializadores</p>
+<ul><li>
+<p><code>sidekiq.rb</code>: Los workers encargados de mandar información
+(<code>integration_stock_worker.rb</code>,
+<code>integration_price_worker.rb</code>,
+<code>centry_stock_save_worker.rb</code>,
+<code>centry_prices_save_worker.rb</code>) son iniciados por intervalos de
+tiempos. Para lograr esto se define cada una de estos workers como <em>cron
+job</em>.</p>
+</li><li>
+<p><code>webhook.rb</code>: Es el encargado de registrar un <em>webhook</em>
+de manera automática en caso de que el proyect no tenga un <em>webhook</em>
+registrado previamente.  Por otra parte, el worker encargado de manejar las
+notificaciones recibidas (<code>notification_listener_worker.rb</code>), 
+se inicializa cada vez que el controlador 
+(<code>notification_listener_controller.rb</code>) recibe una notificación
+desde el <em>webhook</em> registrado.</p>
+</li></ul>
+</li></ul>
+
+<h3 id="label-Configuraci-C3-B3n">Configuración</h3>
+<ol><li>
+<p>Instalar gemas del proyecto <code>bundle install</code>.</p>
+</li><li>
+<p>Iniciar <a href="https://ngrok.com">Ngrok</a>.</p>
+</li><li>
+<p>Configurar variables de ambiente: Ir a
+<code>../CentryBaseExample/config/environments/development.rb</code> y
+definir las variables de configuración:</p>
+<ul><li>
+<p><strong>Centry</strong>:</p>
+<ul><li>
+<p><code>ENV["CENTRY_CLIENT_ID"]</code>: Id de perfil en Centry.</p>
+</li><li>
+<p><code>ENV["CENTRY_SECRET"]</code>: Token secreto de tu perfil en Centry.</p>
+</li><li>
+<p><code>ENV["BASE_URL"]</code>: Link <em>Forwarding</em> entregado por Ngrok.
+<br></p>
+</li></ul>
+</li><li>
+<p><strong>Magento</strong>:</p>
+<ul><li>
+<p><code>ENV["HOST"]</code>: <code>{hostUrl}/magento</code> <em>(ej: <a
+href="http://127.0.1.1/magento">127.0.1.1/magento</a>).</em></p>
+</li><li>
+<p><code>ENV["USERNAME"]</code>: Nombre de usuario.</p>
+</li><li>
+<p><code>ENV["PASSWORD"]</code>: Contraseña.</p>
+</li><li>
+<p><code>ENV["UPDATE_NULL_STOCK"]</code>: String <em>true</em> o
+<em>false</em> para actualizar o no el stock de una variante en caso de que
+se reciba un stock nulo desde Magento.</p>
+</li><li>
+<p><code>ENV["UPDATE_WITH_MAX_PRICE"]</code>: String <em>true</em> o
+<em>false</em> que actualiza un producto en Centry (por ende todas
+variantes) con el precio máximo o mínimo del grupo de productos con el
+mismo <code>id_product_centry</code> presentes en la base de datos local al
+momento de actualizar.</p>
+</li><li>
+<p><code>ENV["STOCK_UPDATE_INTERVAL"]</code>: String con formato <em><a
+href="https://crontab.guru/">Cron Unix</a></em> para definir el intervalo
+de ejecución del <em>cron job</em> que envía los cambios de stock.</p>
+</li><li>
+<p><code>ENV["PRICE_UPDATE_INTERVAL"]</code>: String con formato <em><a
+href="https://crontab.guru/">Cron Unix</a></em> para definir el intervalo
+de ejecución del <em>cron job</em> que envía los cambios de precios.</p>
+</li></ul>
+</li></ul>
+</li></ol>
+
+<h3 id="label-Iniciar+proyecto">Iniciar proyecto</h3>
+<ol><li>
+<p>Iniciar servidor de Magento.</p>
+</li><li>
+<p>Iniciar Redis:\ <code>../{redisFolder}/src$ ./redis-server</code></p>
+</li><li>
+<p>Iniciar Sidekiq:\ <em>En este proyecto ambos cron jobs se ejecutan en la
+cola por defecto de Sidekiq.</em>\ <code>../CentryBaseExample$ bundle exec
+sidekiq</code></p>
+</li><li>
+<p>Iniciar proyecto:\ <code>../CentryBaseExample$ rails s</code></p>
+</li></ol>
+
+<h3 id="label-Uso+del+proyecto">Uso del proyecto</h3>
+<ol><li>
+<p><strong>Actualización de productos</strong>: Para que se haga efectiva la
+actualización de productos desde Magento a Centry debes verificar que el
+SKU del producto en Magento debe coincidir con el SKU de la variante
+correspondiente en Centry (relación mediante SKU). Una vez que se inicie el
+<em>cron job</em> esta actualización se hará automáticamente.</p>
+</li><li>
+<p><strong>Actualización de ordenes</strong>: El envío de órdenes desde Centry
+a Magento ocurrirá automáticamente cada vez que se reciba una notificación
+el <em>webhook</em> registrado en Centry. Por ahora solo se envían nuevas
+órdenes generadas desde Centry, o que no estén registradas previamente en
+la base de datos local.</p>
+</li></ol>
+
+<h3 id="label-Extensibilidad">Extensibilidad</h3>
+
+<p>El fin de este proyecto es generar una base que se pueda expandir según las
+necesidades de cada integración, por lo que para hacer esto lo que se puede
+hacer es complementar lo que hace cada worker ya definido, crear nuevos
+workers con  nuevas tareas, extender los atributos de los modelos, etc.\
+<strong>Nada de esto es obligatorio y queda a criterio de cada integración
+que haga uso de este proyecto como extenderá sus funcionalidades.</strong></p>
+
+<h3 id="label-Referencias">Referencias</h3>
+<ul><li>
+<p><a href="https://www.ruby-lang.org">www.ruby-lang.org</a></p>
+</li><li>
+<p><a href="https://rubyonrails.org">rubyonrails.org</a></p>
+</li><li>
+<p><a
+href="https://magento.com/tech-resources/download">magento.com/tech-resources/download</a></p>
+</li><li>
+<p><a
+href="https://devdocs.magento.com/#/individual-contributors">devdocs.magento.com/#/individual-contributors</a></p>
+</li><li>
+<p><a
+href="https://centrycl.github.io/centry-rest-api-docs">centrycl.github.io/centry-rest-api-docs</a></p>
+</li><li>
+<p><a href="https://www.sqlite.org/index.html">www.sqlite.org/index.html</a></p>
+</li><li>
+<p><a href="https://crontab.guru">crontab.guru</a></p>
+</li><li>
+<p><a href="https://redis.io">redis.io</a></p>
+</li><li>
+<p><a href="https://ngrok.com">ngrok.com</a></p>
+</li></ul>
+</div></div>
+
+      <div id="footer">
+  Generated on Wed Jul 31 14:17:22 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.3.7).
+</div>
+
+    </div>
+  </body>
+</html>
