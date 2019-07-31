@@ -9,15 +9,15 @@ Rails.application.configure do
 
   /---------------CONFIGURATION---------------/
   #CENTRY CONFIGURATION
-  ENV["CENTRY_CLIENT_ID"]     = "bb523e77b31b8092e7aae3b2f495a4b31031e5dea9130b3ac9c18904f150e87a"
-  ENV["CENTRY_SECRET"]        = "45418afdadf07a6a9b8f2bbcbeda7b9c4fc29cdc8ca3b069d5657d6c830bc08f"
+  ENV["CENTRY_CLIENT_ID"]     = ""
+  ENV["CENTRY_SECRET"]        = ""
   ENV["CENTRY_REDIRECT_URI"]  = "urn:ietf:wg:oauth:2.0:oob"
   ENV["CENTRY_SCOPE"]         = "public read_orders write_orders read_products write_products read_integration_config write_integration_config read_user write_user read_webhook write_webhook"
-  ENV["BASE_URL"]             = "https://83e4633e.ngrok.io"
+  ENV["BASE_URL"]             = ""
   #YOUR INTEGRATION CONFIGURATION
   ENV["HOST"]     = "http://127.0.1.1/magento"
-  ENV["USERNAME"] = "admin"
-  ENV["PASSWORD"] = "admin234"
+  ENV["USERNAME"] = ""
+  ENV["PASSWORD"] = ""
   ENV["UPDATE_NULL_STOCK"]      = "false"
   ENV["UPDATE_WITH_MAX_PRICE"]  = "false"
   ENV["STOCK_UPDATE_INTERVAL"]  = "* * * * *" #unix crontab notation https://crontab.guru/examples.html
