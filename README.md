@@ -97,8 +97,8 @@ Realizan las tareas de envío de información lo que permite que cada tarea sea 
 
 ### Uso del proyecto ###
 **Actualización de productos**:
-Para que se haga efectiva la actualización de productos desde Magento a Centry debes verificar que el SKU del producto
-en Magento debe coincidir con el SKU de la variante correspondiente en Centry (relación mediante SKU). Una vez que 
+Para que se haga efectiva la actualización de productos desde Magento a Centry debes verificar que **el SKU del producto
+en Magento debe coincidir con el SKU de la variante correspondiente en Centry** (relación mediante SKU). Una vez que 
 se inicie el *cron job* esta actualización se hará automáticamente.
 
 **Actualización de ordenes**:
